@@ -17,6 +17,12 @@ import grpclib
 from betterproto.grpc.grpclib_server import ServiceBase
 
 from .. import (
+    CmeOpenInterestAggregation as _CmeOpenInterestAggregation__,
+    FundingRateAggregation as _FundingRateAggregation__,
+    HyperliquidLiquidationAggregation as _HyperliquidLiquidationAggregation__,
+    LiquidationAggregation as _LiquidationAggregation__,
+    OpenInterestAggregation as _OpenInterestAggregation__,
+    OptionOpenInterestAggregation as _OptionOpenInterestAggregation__,
     Trade as _Trade__,
     TradeAggregation as _TradeAggregation__,
     TradeSideAgnosticAggregation as _TradeSideAgnosticAggregation__,
@@ -41,8 +47,26 @@ class PointType(betterproto.Enum):
     TRADE_AGG = 9
     """Aggregated trade data"""
 
+    OPEN_INTEREST_AGG = 10
+    """Aggregated open interest data"""
+
+    FUNDING_RATE_AGG = 11
+    """Aggregated funding rate data"""
+
+    LIQUIDATION_AGG = 12
+    """Aggregated liquidation data"""
+
+    CME_OPEN_INTEREST_AGG = 19
+    """Aggregated cme open interest data"""
+
+    OPTION_OPEN_INTEREST_AGG = 59
+    """Aggregated option open interest data"""
+
     TRADE_SIDE_AGNOSTIC_AGG = 107
     """Aggregated trade data, but without grouping by side"""
+
+    HYPERLIQUID_LIQUIDATION_AGG = 147
+    """Aggregated hyperliquid liquidation data"""
 
 
 class PointSide(betterproto.Enum):
@@ -66,12 +90,17 @@ class PointExchange(betterproto.Enum):
     DERIBIT = 2
     BINANCE_FUTURES = 3
     BINANCE_DELIVERY = 4
+    BINANCE_OPTIONS = 5
     BINANCE = 6
     FTX = 7
     OKEX_FUTURES = 8
     OKEX_OPTIONS = 9
     OKEX_SWAP = 10
     OKEX = 11
+    HUOBI_DM = 12
+    HUOBI_DM_SWAP = 13
+    HUOBI_DM_LINEAR_SWAP = 14
+    HUOBI = 15
     BITFINEX_DERIVATIVES = 16
     BITFINEX = 17
     COINBASE = 18
@@ -79,26 +108,94 @@ class PointExchange(betterproto.Enum):
     KRAKEN = 20
     BITSTAMP = 21
     GEMINI = 22
+    POLONIEX = 23
     BYBIT = 24
+    PHEMEX = 25
+    DELTA = 26
+    FTX_US = 27
+    BINANCE_US = 28
+    GATE_IO_FUTURES = 29
+    GATE_IO = 30
+    OKCOIN = 31
+    BITFLYER = 32
+    HITBTC = 33
+    COINFLEX = 34
+    BINANCE_JERSEY = 35
+    BINANCE_DEX = 36
+    UPBIT = 37
+    ASCENDEX = 38
+    DYDX = 39
+    SERUM = 40
+    HUOBI_DM_OPTIONS = 41
+    CME = 42
+    COMMON_BINANCE = 43
+    BITBANK = 44
+    COMMON_BITFINEX = 45
+    BITHUMB = 46
+    BITTREX = 47
+    COINCHECK = 48
+    COMMON_GATE_IO = 49
+    COINBASE_PRO = 50
+    COMMON_HUOBI = 51
+    KUCOIN = 52
+    LMAX = 53
+    COMMON_OKEX = 54
+    LIQUID = 55
+    ZAIF = 56
+    RIBBON = 57
+    EMULATOR = 58
+    GRAYSCALE = 59
     BYBIT_SPOT = 60
     NYSE_AMERICAN = 61
     NASDAQ_BX = 62
     NYSE_NATIONAL = 63
     FINRA = 64
+    UNLISTED_TRADING_PRIVILEGES = 65
+    NASDAQ_ISE = 66
     CBOE_EDGA = 67
     CBOE_EDGX = 68
     NYSE_CHICAGO = 69
     NYSE = 70
     NYSE_ARCA = 71
     NASDAQ = 72
+    CONSOLIDATED_TAPE_ASSOCIATION = 73
     LTSE = 74
     IEX = 75
+    CBOE = 76
     NASDAQ_PHILADELPHIA = 77
     CBOE_BYX = 78
     CBOE_BZX = 79
     MIAX_PEARL = 80
     MEMBERS_EXCHANGE = 81
     OTC_EQUITY_SECURITY = 82
+    BITGET = 83
+    HYPERLIQUID = 84
+    HYPERLIQUID_FUTURES = 85
+    MARKET_INDEPENDENT = 86
+    NASDAQ_SMALL_CAP = 87
+    NASDAQ_INT = 88
+    NASDAQ_PSX = 89
+    PYTH_NETWORK = 90
+    COINBASE_INTERNATIONAL = 91
+    POLYGON = 92
+    POLYGON_FX = 93
+    UNISWAP_V2 = 150
+    SUSHISWAP_V2 = 151
+    PANCAKESWAP_V2 = 152
+    SHIBASWAP = 153
+    FRAXSWAP = 154
+    SOLIDLY = 155
+    UNISWAP_V3 = 156
+    SUSHISWAP_V3 = 157
+    PANCAKESWAP_V3 = 158
+    SOLIDLY_V3 = 159
+    RAYDIUM_V4 = 160
+    RAYDIUM_CLMM = 161
+    ORCA_WHIRLPOOL = 162
+    ORCA_V2 = 163
+    METEORA_POOL = 164
+    METEORA_DLMM = 165
+    UNISWAP_V4 = 166
 
 
 class PointCategory(betterproto.Enum):
@@ -269,23 +366,51 @@ class PointSeriesIdentifier(betterproto.Message):
 class Point(betterproto.Message):
     """Represents a single data point"""
 
-    id: Optional["PointSeriesIdentifier"] = betterproto.message_field(
-        1, optional=True, group="_id"
-    )
+    id: "PointSeriesIdentifier" = betterproto.message_field(1)
     """Identifier for the point series"""
 
     trade: "_Trade__" = betterproto.message_field(7, group="point")
     """Raw trade data"""
+
+    funding_rate_aggregation: "_FundingRateAggregation__" = betterproto.message_field(
+        10, group="point"
+    )
+    """Aggregated funding rate data"""
+
+    liquidation_aggregation: "_LiquidationAggregation__" = betterproto.message_field(
+        12, group="point"
+    )
+    """Aggregated liquidation data"""
+
+    open_interest_aggregation: "_OpenInterestAggregation__" = betterproto.message_field(
+        13, group="point"
+    )
+    """Aggregated open interest data"""
 
     trade_aggregation: "_TradeAggregation__" = betterproto.message_field(
         15, group="point"
     )
     """Aggregated trade data"""
 
+    cme_open_interest_aggregation: "_CmeOpenInterestAggregation__" = (
+        betterproto.message_field(20, group="point")
+    )
+    """Aggregated cme open interest data"""
+
+    option_open_interest_aggregation: "_OptionOpenInterestAggregation__" = (
+        betterproto.message_field(60, group="point")
+    )
+    """Aggregated option open interest data"""
+
     trade_side_agnostic_aggregation: "_TradeSideAgnosticAggregation__" = (
         betterproto.message_field(108, group="point")
     )
     """Aggregated trade data, but without grouping by side"""
+
+    hyperliquid_liquidation_aggregation: "_HyperliquidLiquidationAggregation__" = (
+        betterproto.message_field(148, group="point")
+    )
+    """Aggregated hyperliquid liquidation data"""
 
 
 @dataclass(eq=False, repr=False)
@@ -324,7 +449,7 @@ class ApiStub(betterproto.ServiceStub):
         timeout: Optional[float] = None,
         deadline: Optional["Deadline"] = None,
         metadata: Optional["MetadataLike"] = None
-    ) -> AsyncIterator["PointSeries"]:
+    ) -> AsyncIterator[PointSeries]:
         async for response in self._unary_stream(
             "/api.API/StreamPoints",
             point_request,
@@ -445,7 +570,7 @@ class ApiBase(ServiceBase):
 
     async def stream_points(
         self, point_request: "PointRequest"
-    ) -> AsyncIterator["PointSeries"]:
+    ) -> AsyncIterator[PointSeries]:
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
         yield PointSeries()
 

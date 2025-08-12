@@ -4,3 +4,5 @@ __pycache__
 /build
 /*.egg-info
 env
+/api.kiyotaka.ai
+/dist

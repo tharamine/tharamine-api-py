@@ -1,7 +1,8 @@
 import kiyotaka
+import kiyotaka.api
 
 def main():
-    enums = [kiyotaka.Exchange, kiyotaka.Type]
+    enums = [kiyotaka.api.PointExchange, kiyotaka.api.PointType]
 
     for enum in enums:
         print(enum)

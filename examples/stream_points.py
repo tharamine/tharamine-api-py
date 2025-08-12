@@ -2,12 +2,13 @@ import asyncio
 import kiyotaka
 import kiyotaka.api
 import time
+import os
 
 from grpclib.client import Channel
 
 async def main():
     metadata = {
-        'x-kiyotaka-key': 'YOUR_API_KEY_HERE'
+        'x-kiyotaka-key': os.getenv('KIYOTAKA_KEY', 'YOUR API KEY'),
     }
 
     channel = Channel(
